@@ -1,4 +1,4 @@
-# Outdoor Scenery
+# Open Air App
 This will be the overview. You will deatil what your porjest is about and it's purpose
 
 ### Requirements

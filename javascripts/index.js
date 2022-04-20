@@ -1,4 +1,12 @@
-/* Global */
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  createHomePage();//renders home page at start of page loading 
+  homeClickEvent();
+  placesClickEvent();//activates outdoor places click event listener 
+  sceneryLoad();//loads the json scenes already created. 
+  createNewScenery();//activates create scene click event listener
+})
 
 let scenery = [];
 const apiUrl = 'http://localhost:3000';
@@ -9,35 +17,7 @@ const homeClick = () => document.getElementById("home-link");
 const placesClick = () => document.getElementById('places-link');
 const createScene = () => document.getElementById('create-link');
 const favScenery = () => document.getElementsByTagName('a');
-
-/* Tamplates */
-
-// const homePage = () => {
-//   return `
-//   <h2 class="center-align">Welcome to Open Air</h2>
-//   <h4 class="center-align">Take a Day and Step Into Open Air</h4>
-//   `
-// }
-
-// const sceneryCard = (scene) => {
-//   return `
-//   <div class="row card-panel hoverable" id=${ scene.id }>
-//     <div class="col s12">
-//       <h4 class="center-align">${ scene.title }</h4>
-//       <p class="center-align">${ scene.description }</p>
-//       <p class="center-align">${ scene.favorites } Favorites</p>
-//       <div class="divider"></div>
-//       <h5>Difficulty</h5>
-//       <p>${ scene.difficulty }</p>
-//       <h5>Location</h5>
-//       <p>${ scene.location }</p>
-//       <div class="center-align">
-//         <a class="waves-effect light-green darken-2 btn"><i class="material-icons right">thumb_up</i>Favorite</a>
-//       </div>
-//     </div>
-//   </div>
-//   `
-// }
+const activeSubmit = () => document.getElementById('form');
 
 const createHomePage = () => {
   mainDiv().innerHTML = '';
@@ -63,7 +43,7 @@ const createSceneryCard = (scene) => {
   const hdFour = document.createElement('h4'); 
   const hdFive = document.createElement('h5'); 
   const hdFiveSix = document.createElement('h5'); 
-  const aElement = document.createElement('a'); 
+  const aElement = document.createElement('button'); 
   const iElement = document.createElement('i');
   div.id = `${ scene.id }`;
   div.className = `row card-panel hoverable`;
@@ -99,7 +79,22 @@ const createSceneryCard = (scene) => {
   aElement.appendChild(iElement);
   aElement.addEventListener('click', (e) => {
     e.preventDefault();
-    console.log(e);
+    let favorites = scene.favorites += 1;
+    fetch(`http://localhost:3000/scenery/${scene.id}`,{
+      method: 'PATCH',
+      headers:
+      {
+        "Accept": "application/json",
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "favorites": favorites
+      })
+    })
+    .then(resp => resp.json())
+    .then(favorites => {
+      paragraphTwo.innerText = `${ favorites.favorites } Favorites`;
+    })
   });
 }
 
@@ -115,6 +110,7 @@ const homeClickEvent = () => {
 const placesClickEvent = () => {
   placesClick().addEventListener('click', (e) => {
     e.preventDefault();
+    sceneryLoad();
     mainDiv().innerHTML = '';
     eachScene();
   });
@@ -126,38 +122,129 @@ const sceneryLoad = () => {
   .then(data => scenery = data)//Updates scenery array with json data
 }
 
-// const favoriteClickEvent = () => {
-//   favScenery().addEventListener('click', (e) => {
-//     // e.preventDefault();
-//     console.log(e);
-//   })
-// }
-
-/* Render */
-
-// const renderHome = () => {
-//   mainDiv().innerHTML = createHomePage();//loads the homepage html to the DOM when the home button is clicked.
-// }
-
-// const renderScenery = () => {
-//   mainDiv().innerHTML = eachScene();//takes the new array from eachScene() and adds the html from sceneryCard() to the dom. 
-// }
+const createNewScenery = () => {
+  createScene().addEventListener('click', (e) => {
+    e.preventDefault();
+    createNewSceneryCard();
+  });
+}
 
 const eachScene = () => {
   return scenery.map(scene => createSceneryCard(scene));//runs each json object through
 }
 
-/* Code */
+const createNewSceneryCard = () => {
+  const div = document.createElement('div');
+  const hFour = document.createElement('h4');
+  const form = document.createElement('form');
+  const divOne = document.createElement('div');
+  const divTwo = document.createElement('div');
+  const input = document.createElement('input');
+  const label = document.createElement('label');
+  const divThree = document.createElement('div');
+  const divFour = document.createElement('div');
+  const divFive = document.createElement('div');
+  const divSix = document.createElement('div');
+  const textAreaOne = document.createElement('textarea');
+  const textAreaTwo = document.createElement('textarea');
+  const textAreaThree = document.createElement('textarea');
+  const labelTwo = document.createElement('label');
+  const labelThree = document.createElement('label');
+  const labelFour = document.createElement('label');
+  const divSeven = document.createElement('div');
+  const btnElement = document.createElement('button'); 
+  const iElement = document.createElement('i');
+
+  input.id = "sceneryName";
+  form.id = "form";
+  textAreaOne.id = "briefDescription";
+  textAreaTwo.id = "difficulty";
+  textAreaThree.id = "location";
+
+  div.className = "row card-panel hoverable";
+  hFour.className = "center-align";
+  form.className = "col s12";
+  divOne.className = "row";
+  divTwo.className = "input-field col s6";
+  divThree.className = "row";
+  divFour.className = "input-field col s12";
+  divFive.className = "input-field col s12";
+  divSix.className = "input-field col s12";
+  textAreaOne.className = "materialize-textarea";
+  textAreaTwo.className = "materialize-textarea";
+  textAreaThree.className = "materialize-textarea";
+  divSeven.className = "center-align";
+  btnElement.className = "waves-effect light-green darken-2 btn";
+  iElement.className = "material-icons right";
+
+  input.setAttribute("type", "text");
+  input.setAttribute("data-length", "10");
+  label.setAttribute("for", "sceneryName");
+  textAreaOne.setAttribute("data-length", "120");
+  textAreaTwo.setAttribute("data-length", "120");
+  textAreaThree.setAttribute("data-length", "120");
+  labelTwo.setAttribute("for", "briefDescription");
+  labelThree.setAttribute("for", "difficulty");
+  labelFour.setAttribute("for", "location");
+  
+  hFour.innerText = "Create a New Scenery";
+  label.innerText = "Scenery Name";
+  labelTwo.innerText = "Brief Description";
+  labelThree.innerText = "Difficulty";
+  labelFour.innerText = "Location";
+  btnElement.innerText = "Submit";
+  iElement.innerText = "directions_walk";
+  
+  div.appendChild(hFour);
+  div.appendChild(form);
+  form.appendChild(divOne);
+  divOne.appendChild(divTwo);
+  divTwo.appendChild(input);
+  divTwo.appendChild(label);
+  form.appendChild(divThree);
+  divThree.appendChild(divFour);
+  divThree.appendChild(divFive);
+  divThree.appendChild(divSix);
+  divFour.appendChild(textAreaOne);
+  divFive.appendChild(textAreaTwo);
+  divSix.appendChild(textAreaThree);
+  divFour.appendChild(labelTwo);
+  divFive.appendChild(labelThree);
+  divSix.appendChild(labelFour);
+  form.appendChild(divSeven);
+  divSeven.appendChild(btnElement);
+  btnElement.appendChild(iElement);
+  
+  mainDiv().innerHTML = "";
+  mainDiv().appendChild(div);
+
+  activeSubmit().addEventListener('submit', submittedForm);
+};
+
+const submittedForm = (e) => {
+  e.preventDefault();
+  const [name, description, difficulty, location] = e.target;
+  fetch(apiUrl + '/scenery', {
+    method: "POST",
+    headers: {
+      "Accept": "application/json", //accepting json format
+      "Content-Type": "application/json" //sending json format
+    },
+    body: JSON.stringify({
+      title: name.value,
+      description: description.value,
+      difficulty: difficulty.value,
+      location: location.value,
+      favorites: 0,
+      comments: "" 
+    })
+  })
+  .then(resp => resp.json())
+  .then(data => {
+    scenery.push(data);
+    mainDiv().innerHTML = '';
+    eachScene();
+  })
+}
 
 
-
-
-
-/* DOM */
-
-document.addEventListener('DOMContentLoaded', () => {
-  createHomePage();//renders home page at start of page loading 
-  homeClickEvent();
-  placesClickEvent();//activates event listener 
-  sceneryLoad();//loads the json scenes already created. 
-})
